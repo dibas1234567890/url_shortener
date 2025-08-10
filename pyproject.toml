@@ -1,0 +1,25 @@
+[project]
+name = "url_shortener" 
+
+authors = [
+    {name = "Dibas Pratap Basnet", email = "dibaspratap@gmail.com"},
+]
+
+version = "0.0.1"
+
+description = ""
+
+license = "MIT"
+
+readme = "README.md"
+
+requires-python = "==3.12.3" # Minimum Python version required
+
+
+
+
+
+dependencies = [
+
+]
+
