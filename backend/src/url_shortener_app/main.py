@@ -37,7 +37,7 @@ app.add_middleware(CORSMiddleware,
                 allow_headers=["*"],)
 
 @app.get("/{secret_key}")
-async def retrieve_shortened(secret_key: str, db: Annotated[AsyncIOMotorDatabase, Depends(get_db)]):
+async def retrieve_shortened_redirect(secret_key: str, db: Annotated[AsyncIOMotorDatabase, Depends(get_db)]):
     """Retrieve and redirect to the original URL using the secret key"""
     try: 
         retrieved_url = await db['urls'].find_one_and_update(

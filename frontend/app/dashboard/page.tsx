@@ -13,12 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Link2, Plus, Copy, ExternalLink, BarChart3, LogOut, Loader2, List } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { createShortUrls, getUserUrls } from "@/lib/api"
+import { createShortUrls, getUserUrls, getRedirectUrl } from "@/lib/api"
 import { UserProfile } from "@/components/user-profile"
 import { URLManagement } from "@/components/url-management"
 
 interface ShortenedUrl {
   key: string
+  secret_key: string
   redir_target_url: string
   clicks: number
   time_metadata: string
@@ -121,18 +122,14 @@ export default function DashboardPage() {
     router.push("/")
   }
 
-  const getShortUrl = (key: string) => {
-    // Use the secret_key for the redirect, not the key
-    return `${window.location.origin}/api/v1/shortener/${key}`
-  }
-
   const handleExternalLink = (url: ShortenedUrl) => {
     // Ensure URLs are loaded before allowing redirects
     if (!urlsLoaded) {
       setError("Please wait for URLs to load before testing redirects")
       return
     }
-    window.open(getShortUrl(url.key), "_blank")
+    const redirectUrl = getRedirectUrl(url.secret_key)
+    window.open(redirectUrl, "_blank")
   }
 
   // Show loading state until URLs are preloaded
@@ -276,14 +273,16 @@ export default function DashboardPage() {
                                     {url.clicks} clicks
                                   </div>
                                 </div>
-                                <p className="text-sm font-medium text-gray-900 mb-1">{getShortUrl(url.key)}</p>
+                                <p className="text-sm font-medium text-gray-900 mb-1">
+                                  {getRedirectUrl(url.secret_key)}
+                                </p>
                                 <p className="text-sm text-gray-600 truncate">→ {url.redir_target_url}</p>
                               </div>
                               <div className="flex gap-2">
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => copyToClipboard(getShortUrl(url.key))}
+                                  onClick={() => copyToClipboard(getRedirectUrl(url.secret_key))}
                                 >
                                   <Copy className="h-3 w-3" />
                                 </Button>

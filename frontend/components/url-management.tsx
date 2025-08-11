@@ -19,7 +19,7 @@ import {
   AlertTriangle,
   CheckCircle,
 } from "lucide-react"
-import { getUserUrls, updateUrlActive, testRedirect } from "@/lib/api"
+import { getUserUrls, updateUrlActive, getRedirectUrl } from "@/lib/api"
 
 interface UserUrl {
   _id: string
@@ -100,23 +100,14 @@ export function URLManagement() {
     }
   }
 
-  const getShortUrl = (secretKey: string) => {
-    // This creates the URL that will call GET /{secret_key}
-    return testRedirect(secretKey)
-  }
-
-  const handleExternalLink = async (url: UserUrl) => {
+  const handleExternalLink = (url: UserUrl) => {
     if (!url.is_active) {
       setError("Cannot open inactive URL")
       return
     }
 
-    try {
-      const redirectUrl = await getShortUrl(url.secret_key)
-      window.open(redirectUrl, "_blank")
-    } catch (err) {
-      setError("Failed to open URL")
-    }
+    const redirectUrl = getRedirectUrl(url.secret_key)
+    window.open(redirectUrl, "_blank")
   }
 
   const formatDate = (dateString: string) => {
@@ -151,7 +142,7 @@ export function URLManagement() {
               <Link2 className="h-5 w-5 text-blue-600" />
               My URLs ({urls.length})
             </CardTitle>
-            <CardDescription>Manage all your shortened URLs. Click refresh to load the latest data.</CardDescription>
+            <CardDescription>Manage all your shortened URLs. Redirects happen at the root level.</CardDescription>
           </div>
           <Button onClick={fetchUrls} variant="outline" size="sm" className="gap-2 bg-transparent">
             <RefreshCw className="h-4 w-4" />
@@ -182,7 +173,7 @@ export function URLManagement() {
           </div>
         ) : (
           <div className="space-y-4">
-            
+
 
             {urls.map((url) => (
               <div
@@ -226,7 +217,7 @@ export function URLManagement() {
                       </div>
                     </div>
                     <p className="text-sm font-medium text-gray-900 mb-1">
-                      Redirect URL: {process.env.NEXT_PUBLIC_API_URL}/v1/shortener/{url.secret_key}
+                      Short URL: {getRedirectUrl(url.secret_key)}
                     </p>
                     <p className="text-sm text-gray-600 truncate">→ {url.redir_target_url}</p>
                   </div>
@@ -239,13 +230,7 @@ export function URLManagement() {
                       />
                       {updatingUrl === url.secret_key && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        copyToClipboard(`${process.env.NEXT_PUBLIC_API_URL}/v1/shortener/${url.secret_key}`)
-                      }
-                    >
+                    <Button size="sm" variant="outline" onClick={() => copyToClipboard(getRedirectUrl(url.secret_key))}>
                       <Copy className="h-3 w-3" />
                     </Button>
                     <Button
