@@ -1,6 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from backend.src.url_shortener_app.core import settings
+from url_shortener_app.core import settings
 
 settings = settings.get_settings()
 

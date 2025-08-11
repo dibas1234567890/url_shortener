@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class URLBase(BaseModel): 
-    redir_target_url : str 
+    redir_target_url : list[str] 
 
 class URL(URLBase): 
     is_active : bool 
@@ -11,3 +11,6 @@ class URL(URLBase):
 class URLInfo(URL):
     url : str 
     admin_url : str
+
+class URLUpdateActive(BaseModel):
+    is_active: bool
