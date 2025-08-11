@@ -2,7 +2,7 @@ from functools import lru_cache
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    mongo_uri : str = "mongodb://localhost:27017"
+    mongo_uri : str = "mongodb://localhost:27019"
     db_name : str = "shortener_db"
     uvicorn_host : str = "0.0.0.0"
     uvicorn_port : int = 8500
