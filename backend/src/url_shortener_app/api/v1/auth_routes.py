@@ -12,6 +12,7 @@ from fastapi import status
 from url_shortener_app.schema.user_schema import User
 from url_shortener_app.core.database_ import get_db
 from url_shortener_app.core.settings import get_settings
+from url_shortener_app.logging_.custom_logger import logger
 
 settings = get_settings()
 
@@ -100,7 +101,8 @@ async def crete_user(user : User, db: AsyncIOMotorDatabase = Depends(get_db)):
         
         if user_created.inserted_id: 
             return {"message" : "User created succesfully", "user_creation" : True}
-    except: 
+    except Exception as e: 
+        logger.error(f"Error in {__name__}", e)
         raise HTTPException(status_code=500, detail="couldn't create user")
 
 @auth.post('/login')
@@ -119,16 +121,20 @@ async def login(request : Request, user : User, db : AsyncIOMotorDatabase  = Dep
     Raises:
         HTTPException: May be raised for authentication failures or if user does not exist.
     """
-    request = request
+    try: 
+        request = request
 
-    users_collection = db['users']
-    
-    user_in_db = await users_collection.find_one({"email" : user.email}, {})
+        users_collection = db['users']
+        
+        user_in_db = await users_collection.find_one({"email" : user.email}, {})
 
-    if user: 
-        user_password = hash.verify(user.password, user_in_db['password'])
+        if user: 
+            user_password = hash.verify(user.password, user_in_db['password'])
 
-        if user_password: 
-            return { "access_token" : await create_token(data={"sub" : user.email}), "token_type" : "bearer"}
-    else: 
-        return {"message" : "user doesn't exist"}
+            if user_password: 
+                return { "access_token" : await create_token(data={"sub" : user.email}), "token_type" : "bearer"}
+        else: 
+            return {"message" : "user doesn't exist"}
+    except Exception as e: 
+        logger.error(f"Error in {__name__}", e)
+        raise  e 

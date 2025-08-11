@@ -1,4 +1,12 @@
 services:
+  
+
+  mongo:
+    image: mongo
+    ports:
+      - "27019:27017"
+    networks: 
+      - url_net
   backend: 
     build: 
       context: ./backend
@@ -10,11 +18,7 @@ services:
       - mongo
     networks:
       - url_net
-
-  mongo:
-    image: mongo
-    ports:
-      - "27019:27019"
+      
   frontend: 
     build: 
       context: ./frontend
