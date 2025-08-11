@@ -23,7 +23,7 @@ hash = CryptContext(schemes=['bcrypt'],deprecated = "auto")
 oauth = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 
-async def create_token(data: dict, expires: Optional[timedelta] = None) -> str:
+async def create_token(data: dict, expires: Optional[timedelta] = settings.token_expiry_time) -> str:
     """
     Create a JWT token.
 
@@ -94,7 +94,9 @@ async def crete_user(user : User, db: AsyncIOMotorDatabase = Depends(get_db)):
         hased_pw = hash.hash(user.password)
         
         if user_ecists: 
-            raise HTTPException(status_code=400, detail="User already exists couldn't create, please login")
+            return {"message" :"User already exists"}
+            # raise HTTPException(status_code=400, detail="User already exists couldn't create, please login")
+            
         else: 
             user.password = hased_pw
             user_created = await users_collection.insert_one(user.model_dump())
@@ -128,7 +130,7 @@ async def login(request : Request, user : User, db : AsyncIOMotorDatabase  = Dep
         
         user_in_db = await users_collection.find_one({"email" : user.email}, {})
 
-        if user: 
+        if user_in_db: 
             user_password = hash.verify(user.password, user_in_db['password'])
 
             if user_password: 

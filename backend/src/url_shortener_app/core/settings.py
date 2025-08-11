@@ -1,3 +1,4 @@
+from datetime import timedelta
 from functools import lru_cache
 from pydantic_settings import BaseSettings
 
@@ -7,7 +8,8 @@ class Settings(BaseSettings):
     uvicorn_host : str = "0.0.0.0"
     uvicorn_port : int = 8500
     secret_key : str 
-    frontend_url : str = "http://localhost:3000"
+    frontend_url : str = "http://localhost:3100"
+    token_expiry_time : timedelta = timedelta(minutes=30)
     class Config: 
         env_file = ".env"
 
